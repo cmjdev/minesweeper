@@ -1,63 +1,84 @@
 import random
 import re
-import string
 
-# row,col to dig ex. 2,1
-# frow,col to mark ex. f2,1
+class Cell:
+    mine = None
+    mines = None
 
-TILES = 10
+    def __init__(self, mine):
+        self.mine = mine
 
-mines = []
-active = True
+class Game:
+    active = True
+    tiles = 10
+    map = []
 
-def do_clear(x, y):
-    if mines[y][x]:
-        print("BOOM")
-    else: print("nope :(")
+    def setup(self):
+        # create cells
+        tiles = range(self.tiles)
+        for y in tiles:
+            row = []
+            for x in tiles:
+                r = random.randint(0, 9)
+                row.append(Cell(True) if(r>7) else Cell(False))
+            self.map.append(row)
 
-def do_flag(x, y):
-    print("you flagged row {} and col {}".format(x,y))
+        # find adjacent mines
 
-def do(user_input):
-    flag = 'f[0-9]+,[0-9]+'
-    clear = '^[0-9]+,[0-9]+'
+    def clear(self, x, y):
+        if self.map[y][x].mine:
+            print("BOOM")
+        else: print("nope :(")
 
-    if re.match(flag, user_input):
-        cmd = re.split('f|,', user_input)
-        do_flag(int(cmd[1]), int(cmd[2]))
-    elif re.match(clear, user_input):
-        cmd = re.split(',', user_input)
-        do_clear(int(cmd[0]), int(cmd[1]))
-    else: print("invalid move")
+    def flag(self, x, y):
+        print("you flagged row {} and col {}".format(x,y))
 
+    def do(self, user_input):
+        flag = 'f[0-9]+,[0-9]+'
+        clear = '^[0-9]+,[0-9]+'
 
-def build_map(tiles):
-    for y in range(tiles):
-        row = []
-        for x in range(tiles):
-            r = random.randint(0, 9)
-            row.append(True if(r>7) else False)
-        mines.append(row)
+        if re.match(flag, user_input):
+            cmd = re.split('f|,', user_input)
+            self.flag(int(cmd[1]), int(cmd[2]))
+        elif re.match(clear, user_input):
+            cmd = re.split(',', user_input)
+            self.clear(int(cmd[0]), int(cmd[1]))
+        elif user_input == 'exit':
+            self.active = False
+        else: print("invalid move")
+
+    def user_input(self):
+        move = input('> ')
+        self.do(move)
+    
+    def show(self):
         
-def show(map):
-    print(end="  ")
-    for i in range(TILES):
-        print(i, end=" ")
-    print()
-
-    for i,val in enumerate(map):
-        print(i, end="|")
-        for doot in val:
-            if doot == True:
-                print('*', end="|")
-            else: print(end=" |")
+        # print header
+        print(end="  ")
+        for i in range(self.tiles):
+            print(i, end=" ")
         print()
 
-build_map(TILES)
+        map = enumerate(self.map)
 
-while True:
-    move = input('> ')
-    do(move)
-    if move == 'exit': 
-        break
-    show(mines)
+        for iy,y in map:
+            print(iy, end="|")
+            for x in y:
+                if x.mine == True:
+                    print('*', end="|")
+                else: print(end=" |")
+            print()
+
+
+    def run(self):
+        while self.active:
+            self.show()
+            self.user_input()
+
+
+    def __init__(self):
+        self.setup()
+
+
+game = Game()
+game.run()
