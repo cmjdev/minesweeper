@@ -51,7 +51,7 @@ class Game:
             for x in tiles:
                 r = random.randint(0, 9)
                 row.append(Cell(True, (x, y)) if(
-                    r > 7) else Cell(False, (x, y)))
+                    r > 8) else Cell(False, (x, y)))
             self.map.append(row)
 
         # find adjacent mines
@@ -60,11 +60,36 @@ class Game:
                 self.get_mines(cell)
 
     def clear(self, cell):
-        if cell.mine:
-            print("BOOM, GAME OVER")
-            self.active = False
-        else:
-            cell.status = "cleared"
+
+        if not cell.status == "cleared":
+            if cell.mine:
+                print("BOOM, GAME OVER")
+                self.active = False
+            elif cell.mines:
+                cell.status = "cleared"
+            else:
+                cell.status = "cleared"
+                tiles = self.tiles - 1
+
+                x = cell.pos[0]
+                y = cell.pos[1]
+
+                if x > 0:
+                    self.clear(self.map[y][x-1])
+                if x < tiles:
+                    self.clear(self.map[y][x+1])
+                if y > 0 and x > 0:
+                    self.clear(self.map[y-1][x-1])
+                if y > 0:
+                    self.clear(self.map[y-1][x])
+                if y > 0 and x < tiles:
+                    self.clear(self.map[y-1][x+1])
+                if y < tiles and x > 0:
+                    self.clear(self.map[y+1][x-1])
+                if y < tiles:
+                    self.clear(self.map[y+1][x])
+                if y < tiles and x < tiles:
+                    self.clear(self.map[y+1][x+1])
 
     def flag(self, cell):
         print("you flagged {}".format(cell.pos))
