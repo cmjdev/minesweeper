@@ -92,7 +92,8 @@ class Game:
                     self.clear(self.cells[y+1][x+1])
 
     def flag(self, cell):
-        print("you flagged {}".format(cell.pos))
+        if cell.status != "cleared":
+            cell.status = "flagged"
 
     def do(self, user_input):
         flag = 'f[0-9]+,[0-9]+'
@@ -128,8 +129,12 @@ class Game:
                 if cell.status == "cleared":
                     if cell.mines > 0:
                         print(cell.mines, end="|")
-                    else: print(" ", end="|")
-                else: print(".", end="|")
+                    else:
+                        print(" ", end="|")
+                elif cell.status == "flagged":
+                    print("F", end="|")
+                else:
+                    print(".", end="|")
             print()
 
     def run(self):
