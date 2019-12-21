@@ -2,16 +2,35 @@ import random
 import re
 
 class Cell:
+    pos = ()
     mine = None
     mines = 0
 
-    def __init__(self, mine):
+    def __init__(self, mine, pos):
         self.mine = mine
+        self.pos = pos
 
 class Game:
     active = True
     tiles = 10
     map = []
+
+    def get_mines(self, cell):
+
+        x = cell.pos[0]
+        y = cell.pos[1]
+
+        tiles = self.tiles - 1
+
+        if x > 0: cell.mines += self.map[y][x-1].mine
+        if x < tiles: cell.mines += self.map[y][x+1].mine
+        if y > 0 and x > 0: cell.mines += self.map[y-1][x-1].mine
+        if y > 0: cell.mines += self.map[y-1][x].mine
+        if y > 0 and x < tiles: cell.mines += self.map[y-1][x+1].mine
+        if y < tiles and x > 0: cell.mines += self.map[y+1][x-1].mine
+        if y < tiles: cell.mines += self.map[y+1][x].mine
+        if y < tiles and x < tiles: cell.mines += self.map[y+1][x+1].mine
+
 
     def setup(self):
         # create cells
@@ -20,51 +39,13 @@ class Game:
             row = []
             for x in tiles:
                 r = random.randint(0, 9)
-                row.append(Cell(True) if(r>7) else Cell(False))
+                row.append(Cell(True, (x, y)) if(r>7) else Cell(False, (x, y)))
             self.map.append(row)
 
         # find adjacent mines
-
-        for y in tiles:
-            for x in tiles:
-
-                # perfect case
-
-                if x > 0 and x < self.tiles - 1 and y > 0 and y < self.tiles - 1:
-                    self.map[y][x].mines += self.map[y][x-1].mine
-                    self.map[y][x].mines += self.map[y][x+1].mine
-                    self.map[y][x].mines += self.map[y-1][x-1].mine
-                    self.map[y][x].mines += self.map[y-1][x].mine
-                    self.map[y][x].mines += self.map[y-1][x+1].mine
-                    self.map[y][x].mines += self.map[y+1][x-1].mine
-                    self.map[y][x].mines += self.map[y+1][x].mine
-                    self.map[y][x].mines += self.map[y+1][x+1].mine
-
-                # try: 
-                #     self.map[y][x].mines += self.map[y][x-1].mine
-                # except: pass
-                # try:
-                #     self.map[y][x].mines += self.map[y][x+1].mine
-                # except: pass
-                # try:
-                #     self.map[y][x].mines += self.map[y-1][x-1].mine
-                # except: pass
-                # try:
-                #     self.map[y][x].mines += self.map[y-1][x].mine
-                # except: pass
-                # try:
-                #     self.map[y][x].mines += self.map[y-1][x+1].mine
-                # except: pass
-                # try:
-                #     self.map[y][x].mines += self.map[y+1][x-1].mine
-                # except: pass
-                # try:
-                #     self.map[y][x].mines += self.map[y+1][x].mine
-                # except: pass
-                # try:
-                #     self.map[y][x].mines += self.map[y+1][x+1].mine
-                # except: pass
-
+        for y in self.map:
+            for cell in y:
+                self.get_mines(cell)
 
     def debug(self, x, y):
         print(self.map[y][x].mines)
