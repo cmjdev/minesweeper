@@ -2,8 +2,9 @@
 Quick excersize to build minesweeper with python
 
 ## TODO
-- Implement flagging cell `fx,y`
-- Implement WIN function
+- Implement > 10x10 tile display
+- Implement difficulty system
 
 ## Instructions
-`x,y` clears the desired cell
+- `x,y` clears the desired cell
+- `fx,y` marks the desired cell

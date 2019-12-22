@@ -72,7 +72,7 @@ class Game:
             self.cleared += 1
 
             if cell.mine:
-                print("BOOM, GAME OVER")
+                print("BOOM, YOU DIED")
                 self.active = False
             elif cell.mines:
                 cell.status = "cleared"
